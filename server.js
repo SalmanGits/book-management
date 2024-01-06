@@ -7,6 +7,7 @@ const app = express()
 const { connectToDb } = require("./connection/db.js");
 const errorHandler = require("./middleware/errorHandler.js");
 const userRoutes = require("./routes/user.route.js")
+const bookRoutes = require("./routes/book.route.js")
 const PORT = process.env.PORT || 3000
 //middlewares
 app.use(cors())
@@ -18,6 +19,7 @@ app.use(express.urlencoded({ extended: false }))
 connectToDb()
 //routes
 app.use("/api/auth",userRoutes)
+app.use("/api/books",bookRoutes)
 //error handler
 app.use(errorHandler)
 app.listen(PORT, () => {
