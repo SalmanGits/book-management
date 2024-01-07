@@ -42,7 +42,7 @@ const unpublishBook = async (req, res, next) => {
 const getBooksOfUser = async (req, res, next) => {
     try {
         const { id } = req.user
-        const books = await Book.find({ author: id, isPublished: true })
+        const books = await Book.find({ author: id, isPublished: true }).populate("author")
         sendResponse(res, { status: 200, message: "All books of user", data: books, success: true })
     } catch (error) {
         next(error)
@@ -60,7 +60,7 @@ const getAllBooks = async (req, res, next) => {
         const totalBooks = await Book.countDocuments({ isPublished: true });
         const totalPages = Math.ceil(totalBooks / limit);
 
-        const books = await Book.find({ isPublished: true })
+        const books = await Book.find({ isPublished: true }).populate("author")
             .skip(skip)
             .limit(limit);
 
@@ -84,12 +84,19 @@ const searchBooks = async (req, res, next) => {
         const query = {
             isPublished: true
         };
+        if (!title) {
+            return sendResponse(res, {
+                status: 400,
+                message: 'Please provide a valid title for search',
+                success: false,
+            });
+        }
 
         if (title) {
             query.title = { $regex: title, $options: 'i' };
         }
 
-        const books = await Book.find(query);
+        const books = await Book.find(query).populate("author");
 
         sendResponse(res, {
             status: 200,
